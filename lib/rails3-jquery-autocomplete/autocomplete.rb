@@ -83,7 +83,7 @@ module Rails3JQueryAutocomplete
     #
     def json_for_autocomplete(items, method, extra_data=[])
       items.collect do |item|
-        hash = {"id" => item.id.to_s, "label" => item.send(method), "value" => item.send(method)}
+        hash = {"id" => item.id.to_s, "label" => label_with_flag(item.send(method)), "value" => item.send(method)}
         extra_data.each do |datum|
           hash[datum] = item.send(datum)
         end if extra_data
@@ -91,6 +91,30 @@ module Rails3JQueryAutocomplete
         hash
       end
     end
+    
+    private
+
+     def label_with_flag label
+      "<i class=\"flag-#{country_code(label)}\"></i>  #{label}"
+     end
+
+
+
+     def country_code label
+      f = File.read("lib/flags.json")
+      flags = JSON.parse(f)
+      index = flags.index {|x| x[2] == country_name(label)}
+      if index
+        flags[index][0]
+      else 
+        "NONE"
+      end
+     end
+
+      def country_name label
+       label.split(',').last.lstrip
+      end
+    
   end
 end
 
